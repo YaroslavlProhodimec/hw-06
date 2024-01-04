@@ -28,6 +28,9 @@ commentsRouter.put('/:commentId',
 
         const commentId = req.params.commentId
         const result = await commentsCollection.findOne({_id:new ObjectId(commentId)})
+        if(result){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        }
         if(result?.commentatorInfo.userId !==req.user?.id ){
             return res.sendStatus(403)
         }
@@ -42,6 +45,10 @@ commentsRouter.delete('/:commentId',
         const commentId = req.params.commentId
 
         const result = await commentsCollection.findOne({_id:new ObjectId(commentId)})
+        if(result){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+
+        }
         if(result?.commentatorInfo.userId !==req.user?.id ){
             return res.sendStatus(403)
         }

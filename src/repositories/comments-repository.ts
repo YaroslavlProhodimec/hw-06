@@ -75,10 +75,11 @@ export class CommentsRepository {
 
         const user: any = await usersCollection.findOne({_id: id})
 
-        // const commentId = new ObjectId()
+         const commentId = new ObjectId()
 
         const newComment: any = {
-            id: postId,
+            postId:postId,
+            id: commentId.toString(),
             content,
             commentatorInfo: {
                 userId: id,
@@ -89,7 +90,7 @@ export class CommentsRepository {
         const comment = await commentsCollection.insertOne(newComment)
 
         if (comment) {
-            const result: any = await commentsCollection.findOne({id: postId})
+            const result: any = await commentsCollection.findOne({id: commentId.toString()})
             return {
                 id: result!.id,
                 content: result!.content,

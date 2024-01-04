@@ -38,10 +38,10 @@ export class CommentsRepository {
         const pagesCount = Math.ceil(totalCount / pageSize)
 
         return {
-            pagesCount: pagesCount,
+            pagesCount: pagesCount - 1,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: totalCount,
+            totalCount: totalCount - 1,
             items: comments.map(commentsMapper)
         }
 

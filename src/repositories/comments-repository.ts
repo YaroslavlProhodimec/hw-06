@@ -15,7 +15,9 @@ export class CommentsRepository {
         const pageSize = sortData.pageSize ?? 10
         const pageNumber = sortData.pageNumber ?? 1
 
-        let filter = {postId: postId}
+        let filter = {
+            id: postId
+        }
 
         // if (searchNameTerm) {
         //     filter = {
@@ -27,14 +29,14 @@ export class CommentsRepository {
         // }
         // const filter = {id: id}
 
-        const comments: any = await commentsCollection.find(filter)
+        const comments: any = await commentsCollection.find({id:postId})
             .sort(sortBy, sortDirection)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .toArray()
 
         const totalCount = await commentsCollection
-            .countDocuments(filter)
+            .countDocuments({id:postId})
 
         const pagesCount = Math.ceil(totalCount / pageSize)
 
@@ -68,24 +70,12 @@ export class CommentsRepository {
 
         const createdAt = new Date()
 
-        // {
-        //     "id": "string",
-        //     "content": "string",
-        //     "commentatorInfo": {
-        //     "userId": "string",
-        //         "userLogin": "string"
-        // },
-        //     "createdAt": "2024-01-04T09:35:46.339Z"
-        // }
-
-        console.log(id, 'id')
         const user: any = await usersCollection.findOne({_id: id})
-        console.log(user, 'await usersCollection.findOne({userId:id})')
 
         // const commentId = new ObjectId()
 
         const newComment: any = {
-            postId: postId,
+            id: postId,
             content,
             commentatorInfo: {
                 userId: id,
@@ -93,20 +83,10 @@ export class CommentsRepository {
             },
             createdAt: createdAt.toISOString()
         }
-        const result = await commentsCollection.insertOne(newComment)
+        const comment = await commentsCollection.insertOne(newComment)
 
-        // {
-        //     "id": "string",
-        //     "content": "string",
-        //     "commentatorInfo": {
-        //     "userId": "string",
-        //         "userLogin": "string"
-        // },
-        //     "createdAt": "2024-01-04T17:45:58.406Z"
-        // }
-        if (result) {
+        if (comment) {
             const result: any = await commentsCollection.findOne({id: postId})
-            console.log(result, 'result commentsCollection.findOne({id:commentId})')
             return {
                 id: result!.id,
                 content: result!.content,

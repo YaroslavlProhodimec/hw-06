@@ -73,12 +73,14 @@ postRoute.post('/:postId/comments', bearerAuth,
     commentsValidation(),
     async (req: any, res: Response) => {
         const content = req.body.content
-        const postId = await PostRepository.getPostById(req.params.postId)
-        if(!postId){
+        const postId  = req.params.postId
+
+        const post = await PostRepository.getPostById(postId)
+        if(!post){
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
         }
-        const newComment = await CommentsRepository.createComments(content, req.user!._id,req.params.postId)
+        const newComment = await CommentsRepository.createComments(content, req.user!._id,postId)
 
         if (newComment) {
             res.status(HTTP_STATUSES.CREATED_201).json(newComment)
@@ -99,13 +101,14 @@ postRoute.get('/:postId/comments',
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
         }
-        const postId = await PostRepository.getPostById(req.params.postId)
-        if(!postId){
+        const postId  = req.params.postId
+        const post = await PostRepository.getPostById(postId)
+        if(!post){
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
         }
 
-        const comments = await CommentsRepository.getAllCommentsQueryParam(sortData,req.params.postId)
+        const comments = await CommentsRepository.getAllCommentsQueryParam(sortData,postId)
 
         if (comments) {
             res.status(HTTP_STATUSES.OK_200).json(comments)

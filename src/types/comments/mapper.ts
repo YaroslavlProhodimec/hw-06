@@ -8,7 +8,7 @@
 //     createdAt: post.createdAt
 export const commentsMapper = (comment: any): any => {
     return {
-        id: comment._id.toString(),
+        id: comment.id.toString(),
         content: comment.content,
         commentatorInfo: {
             userId: comment.commentatorInfo.userId,

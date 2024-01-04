@@ -78,7 +78,7 @@ postRoute.post('/:postId/comments', bearerAuth,
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
         }
-        const newComment = await CommentsRepository.createComments(content, req.user!._id)
+        const newComment = await CommentsRepository.createComments(content, req.user!._id,postId)
 
         if (newComment) {
             res.status(HTTP_STATUSES.CREATED_201).json(newComment)
@@ -105,7 +105,7 @@ postRoute.get('/:postId/comments',
             return;
         }
 
-        const comments = await CommentsRepository.getAllCommentsQueryParam(sortData)
+        const comments = await CommentsRepository.getAllCommentsQueryParam(sortData,postId)
 
         if (comments) {
             res.status(HTTP_STATUSES.OK_200).json(comments)

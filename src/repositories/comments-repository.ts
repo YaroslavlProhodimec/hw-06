@@ -29,7 +29,7 @@ export class CommentsRepository {
         // }
         // const filter = {id: id}
 
-        const comments: any = await commentsCollection.find({id:new ObjectId(postId)})
+        const comments: any = await commentsCollection.find({id: postId})
             .sort(sortBy, sortDirection)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)

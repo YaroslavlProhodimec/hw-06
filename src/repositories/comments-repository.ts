@@ -47,7 +47,7 @@ export class CommentsRepository {
             pagesCount: pagesCount,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: +totalCount,
+            totalCount: totalCount,
             items: comments.map(commentsMapper)
         }
 

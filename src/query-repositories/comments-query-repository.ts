@@ -25,7 +25,9 @@ export const commentsQueryRepository = {
             if (sortDirection === "asc") {
                 sortOptions[sortBy] = 1
             }
-            const filter = {postId: id}
+            const filter = {
+                id: id
+            }
 
             const totalCount = await commentsCollection.countDocuments(filter) // откуда он берет дополнительную единицу?
             const pagesCount = Math.ceil(totalCount / +pageSize)

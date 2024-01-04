@@ -78,7 +78,7 @@ export class CommentsRepository {
         // const commentId = new ObjectId()
 
         const newComment: any = {
-            postId: postId,
+            id: postId,
             content,
             commentatorInfo: {
                 userId: id,

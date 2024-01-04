@@ -27,11 +27,7 @@ export class CommentsRepository {
             }
         }
 
-        const comments: any = await commentsCollection.find(
-            // {
-            filter
-            // }
-        )
+        const comments: any = await commentsCollection.find(filter)
             .sort(sortBy, sortDirection)
             .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
@@ -46,7 +42,7 @@ export class CommentsRepository {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: +totalCount,
+            totalCount: +totalCount - 1,
             items: comments.map(commentsMapper)
         }
 

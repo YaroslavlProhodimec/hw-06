@@ -12,7 +12,7 @@ export const commentsRoute = Router({})
 commentsRoute.get('/:id',
 
     async (req: any, res: Response) => {
-        console.log(req, 'req')
+
         const comment = await CommentsRepository.getCommentById(req.params.id)
 
         if (comment) {
@@ -57,10 +57,12 @@ commentsRoute.delete('/:id',
         const user = req.user
         const id = req.params.id
         const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
+
         if (!comment) {
             res.sendStatus(404)
             return;
         }
+
         if (comment.commentatorInfo.userId.toString() !== user._id.toString()) {
             res.sendStatus(403)
             return;

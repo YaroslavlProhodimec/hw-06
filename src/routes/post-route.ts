@@ -4,7 +4,7 @@ import {BlogParams} from "../types/blog/input";
 import {postValidation} from "../validators/post-validator";
 import {authMiddleware, bearerAuth} from "../middlewares/auth/auth-middleware";
 import {HTTP_STATUSES} from "../utils/common";
-import {commentsIdValidation, commentsValidation, postIdValidation} from "../validators/comments-validator";
+import {commentsValidation} from "../validators/comments-validator";
 import {CommentsRepository} from "../repositories/comments-repository";
 
 
@@ -73,6 +73,11 @@ postRoute.post('/:postId/comments', bearerAuth,
     commentsValidation(),
     async (req: any, res: Response) => {
         const content = req.body.content
+        const postId = await PostRepository.getPostById(req.params.postId)
+        if(!postId){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+            return;
+        }
         const newComment = await CommentsRepository.createComments(content, req.user!._id)
 
         if (newComment) {

@@ -42,6 +42,7 @@ export const bearerAuth = async (req: any, res: Response, next: NextFunction) =>
 
     if (!req.headers.authorization) {
         res.send(HTTP_STATUSES.UNAUTHORIZED_401)
+        return ;
     }
 
     const token = req.headers.authorization.split(' ')[1]

@@ -32,7 +32,7 @@ commentsRoute.put('/:id',
         const id = req.params.id
         const comment: any = await CommentsRepository.getCommentById(id)
 
-        if (!comment.commentatorInfo) {
+        if (!comment) {
             res.sendStatus(404)
             return;
         }
@@ -57,7 +57,7 @@ commentsRoute.delete('/:id',
         const user = req.user
         const id = req.params.id
         const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
-        if (comment === null) {
+        if (!comment) {
             res.sendStatus(404)
             return;
         }

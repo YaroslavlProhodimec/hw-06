@@ -3,6 +3,8 @@ import {CommentsRepository} from "../repositories/comments-repository";
 import {HTTP_STATUSES} from "../utils/common";
 import {bearerAuth} from "../middlewares/auth/auth-middleware";
 import {commentsValidation} from "../validators/comments-validator";
+import {commentsCollection} from "../index";
+import {ObjectId} from "mongodb";
 
 
 export const commentsRoute = Router({})
@@ -26,11 +28,22 @@ commentsRoute.put('/:id',
     async (req: any, res: Response) => {
 
         const content = req.body.content
-        const isUpdated = await CommentsRepository.updateComment(req.params.id, content,req.user)
-        if(isUpdated === null){
+        const user = req.user
+        const id = req.params.id
+        const comment: any = await CommentsRepository.getCommentById(id)
+
+        if (!comment.commentatorInfo) {
+            res.sendStatus(404)
+            return;
+        }
+
+        if (comment.commentatorInfo.userId.toString() !== user._id.toString()) {
             res.sendStatus(403)
             return;
         }
+
+        const isUpdated = await CommentsRepository.updateComment(id, content,)
+
         if (isUpdated) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
             return;
@@ -41,12 +54,19 @@ commentsRoute.put('/:id',
 commentsRoute.delete('/:id',
     bearerAuth,
     async (req: any, res: Response) => {
-
-        let idDeleted = await CommentsRepository.deleteComment(req.user._id,req.params.id)
-        if(idDeleted === null){
+        const user = req.user
+        const id = req.params.id
+        const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
+        if (comment === null) {
+            res.sendStatus(404)
+            return;
+        }
+        if (comment.commentatorInfo.userId.toString() !== user._id.toString()) {
             res.sendStatus(403)
             return;
         }
+        let idDeleted = await CommentsRepository.deleteComment(req.params.id)
+
         if (idDeleted) res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         else res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     })

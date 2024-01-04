@@ -1,7 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../../utils/common";
 import {jwtService} from "../../domain/jwt-service";
-import {UsersRepository} from "../../repositories/users-repository";
 import {usersCollection} from "../../index";
 import {ObjectId} from "mongodb";
 
@@ -47,13 +46,17 @@ export const bearerAuth = async (req: any, res: Response, next: NextFunction) =>
 
     const token = req.headers.authorization.split(' ')[1]
     const userId = await jwtService.getUserIdByToken(token)
+
     console.log(userId, 'userId await jwtService.getUserIdByToken(token)')
+
     let id =  new ObjectId(userId)
     if (userId) {
         req.user = await usersCollection.findOne({_id: id })
         console.log(req.user,'req.user ')
         return next()
     }
-    // res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+
+    // res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 }

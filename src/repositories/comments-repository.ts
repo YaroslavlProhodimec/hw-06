@@ -41,13 +41,13 @@ export class CommentsRepository {
         const totalCount = await commentsCollection
             .countDocuments(filter)
 
-        const pageCount = Math.ceil(totalCount / +pageSize)
+        const pagesCount = Math.ceil(totalCount / +pageSize)
 
         return {
-            pagesCount: pageCount,
+            pagesCount: pagesCount,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: +totalCount - 1,
+            totalCount: +totalCount,
             items: comments.map(commentsMapper)
         }
 
@@ -96,6 +96,15 @@ export class CommentsRepository {
         }
         const result = await commentsCollection.insertOne(newComment)
 
+        // {
+        //     "id": "string",
+        //     "content": "string",
+        //     "commentatorInfo": {
+        //     "userId": "string",
+        //         "userLogin": "string"
+        // },
+        //     "createdAt": "2024-01-04T17:45:58.406Z"
+        // }
         if (result) {
             const result: any = await commentsCollection.findOne({id: commentId})
             console.log(result, 'result commentsCollection.findOne({id:commentId})')

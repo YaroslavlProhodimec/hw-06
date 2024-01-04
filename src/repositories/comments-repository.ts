@@ -9,12 +9,6 @@ import {BlogRepository} from "./blog-repository";
 
 export class CommentsRepository {
     static async getAllCommentsQueryParam(sortData: any) {
-        // searchNameTerm: req.query.searchNameTerm,
-        //     sortBy: req.query.sortBy,
-        //     sortDirection: req.query.sortDirection,
-        //     pageNumber: req.query.pageNumber,
-        //     pageSize: req.query.pageSize,
-        // pageSize=3&pageNumber=1
         const sortDirection = sortData.sortDirection ?? 'desc'
         const sortBy = sortData.sortBy ?? 'createdAt'
         const searchNameTerm = sortData.searchNameTerm ?? null
@@ -23,14 +17,14 @@ export class CommentsRepository {
 
         let filter = {}
 
-        if (searchNameTerm) {
-            filter = {
-                name: {
-                    $regex: searchNameTerm,
-                    $options: 'i'
-                }
-            }
-        }
+        // if (searchNameTerm) {
+        //     filter = {
+        //         name: {
+        //             $regex: searchNameTerm,
+        //             $options: 'i'
+        //         }
+        //     }
+        // }
 
         const comments: any = await commentsCollection.find(filter)
             .sort(sortBy, sortDirection)

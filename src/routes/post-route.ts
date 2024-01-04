@@ -99,6 +99,7 @@ postRoute.get('/:postId/comments',
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
         }
+
         const comments = await CommentsRepository.getAllCommentsQueryParam(sortData)
 
         if (comments) {

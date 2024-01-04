@@ -4,6 +4,8 @@ import {ObjectId, WithId} from "mongodb";
 import {BlogType} from "../types/blog/output";
 import {postMapper} from "../types/post/mapper";
 import {commentsMapper} from "../types/comments/mapper";
+import {UpdatePostDto} from "../types/post/input";
+import {BlogRepository} from "./blog-repository";
 
 export class CommentsRepository {
     static async getAllCommentsQueryParam(sortData: any) {
@@ -77,7 +79,7 @@ export class CommentsRepository {
         // },
         //     "createdAt": "2024-01-04T09:35:46.339Z"
         // }
-        console.log(id,'id')
+        console.log(id, 'id')
         const user: any = await usersCollection.findOne({_id: id})
         console.log(user, 'await usersCollection.findOne({userId:id})')
 
@@ -111,16 +113,42 @@ export class CommentsRepository {
         //
     }
 
+    static async updateComment(id: string, content: any, user: any) {
+        console.log(id, 'id')
+        console.log(content, 'content')
+        console.log(user, 'user')
+
+        const comment: any = await CommentsRepository.getCommentById(id)
+        console.log(comment, 'comment')
+        if (comment === null) {
+            return null
+        }
+        if (comment.commentatorInfo.userId.toString() !== user._id.toString()) {
+            return null
+        }
+        let result = await commentsCollection.updateOne({id: new ObjectId(id)}, {
+            $set: {
+                content: content,
+
+            }
+        })
+        console.log(result, 'result')
+        return result.matchedCount === 1
+    }
+
     static async deleteComment(userId: any, id: string) {
 
         try {
-            const comment:any = await commentsCollection.findOne({id: new ObjectId(id)})
-            console.log(comment.commentatorInfo.userId,'comment.commentatorInfo:')
-            console.log(userId,'userId')
-            console.log(comment.commentatorInfo.userId.toString() !== userId.toString(),'comment.commentatorInfo.userId !== userId')
-             if(comment.commentatorInfo.userId.toString() !== userId.toString()){
-                 return null
-             }
+            const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
+            console.log(comment.commentatorInfo.userId, 'comment.commentatorInfo:')
+            console.log(userId, 'userId')
+            console.log(comment.commentatorInfo.userId.toString() !== userId.toString(), 'comment.commentatorInfo.userId !== userId')
+            if (comment === null) {
+                return null
+            }
+            if (comment.commentatorInfo.userId.toString() !== userId.toString()) {
+                return null
+            }
             const result = await commentsCollection.deleteOne({id: new ObjectId(id)})
             return result.deletedCount === 1
 

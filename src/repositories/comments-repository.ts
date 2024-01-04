@@ -15,7 +15,7 @@ export class CommentsRepository {
         const pageSize = sortData.pageSize ?? 10
         const pageNumber = sortData.pageNumber ?? 1
 
-        let filter = {id: postId}
+        let filter = {postId: postId}
 
         // if (searchNameTerm) {
         //     filter = {
@@ -85,7 +85,7 @@ export class CommentsRepository {
         // const commentId = new ObjectId()
 
         const newComment: any = {
-            id: postId,
+            postId: postId,
             content,
             commentatorInfo: {
                 userId: id,

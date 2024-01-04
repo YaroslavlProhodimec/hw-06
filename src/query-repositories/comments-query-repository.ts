@@ -26,7 +26,7 @@ export const commentsQueryRepository = {
                 sortOptions[sortBy] = 1
             }
             const filter = {
-                id: id
+                postId: id
             }
 
             const totalCount = await commentsCollection.countDocuments(filter) // откуда он берет дополнительную единицу?

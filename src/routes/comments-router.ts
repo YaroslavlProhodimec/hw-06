@@ -7,6 +7,8 @@ import {CommentViewModel} from "../models/comments-model/comments-models";
 import {bearerAuth} from "../middlewares/auth-middleware";
 import {validateComments} from "../models/comments-model/comments-validate";
 import {ownerMiddlevare} from "../middlewares/owner-middleware";
+import {commentsCollection} from "../db/db";
+import {ObjectId} from "mongodb";
 
 export const commentsRouter = Router({})
 
@@ -25,6 +27,10 @@ commentsRouter.put('/:commentId',
     async (req: Request, res: Response) => {
 
         const commentId = req.params.commentId
+        const result = await commentsCollection.findOne({_id:new ObjectId(commentId)})
+        if(result?.commentatorInfo.userId !==req.user?.id ){
+            return res.sendStatus(403)
+        }
         const isUpdated = await commentsService.updateComment(commentId, req.body)
         isUpdated ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) :
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -33,6 +39,12 @@ commentsRouter.put('/:commentId',
 commentsRouter.delete('/:commentId',
     bearerAuth,
     async (req: Request, res: Response) => {
+        const commentId = req.params.commentId
+
+        const result = await commentsCollection.findOne({_id:new ObjectId(commentId)})
+        if(result?.commentatorInfo.userId !==req.user?.id ){
+            return res.sendStatus(403)
+        }
         const isDeleted = await commentsService.deleteComment(req.params.commentId)
         isDeleted ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) :
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

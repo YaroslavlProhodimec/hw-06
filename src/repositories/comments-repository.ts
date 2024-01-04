@@ -12,6 +12,7 @@ export const commentsRepository = {
 
     async updateComment(id: string, body: any): Promise<any> {
         if(!ObjectId.isValid(id)) return false
+
         const result = await commentsCollection.updateOne({_id: new ObjectId(id)}, {
             $set: {
                 content: body.content

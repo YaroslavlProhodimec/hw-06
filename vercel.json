@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "4back",
+  "name": "express-api",
   "builds": [
     {
       "src": "src/index.ts",

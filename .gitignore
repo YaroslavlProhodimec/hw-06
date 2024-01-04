@@ -1,5 +1,4 @@
-node_modules
-.idea
-dist
-yarn.lock
+/node_modules
+/dist
+/.idea
 .env

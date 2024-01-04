@@ -1,141 +1,33 @@
-import {OutputPostType, PostType} from "../types/post/output";
-import {commentsCollection, postCollection, usersCollection} from "../index";
-import {ObjectId, WithId} from "mongodb";
-import {BlogType} from "../types/blog/output";
-import {postMapper} from "../types/post/mapper";
-import {commentsMapper} from "../types/comments/mapper";
-import {UpdatePostDto} from "../types/post/input";
-import {BlogRepository} from "./blog-repository";
-
-export class CommentsRepository {
-    static async getAllCommentsQueryParam(sortData: any, postId: any) {
-        const sortDirection = sortData.sortDirection ?? 'desc'
-        const sortBy = sortData.sortBy ?? 'createdAt'
-        const searchNameTerm = sortData.searchNameTerm ?? null
-        const pageSize = sortData.pageSize ?? 10
-        const pageNumber = sortData.pageNumber ?? 1
-
-        let filter = {
-            postId: postId
-        }
-
-        // if (searchNameTerm) {
-        //     filter = {
-        //         name: {
-        //             $regex: searchNameTerm,
-        //             $options: 'i'
-        //         }
-        //     }
-        // }
-        // const filter = {id: id}
-
-        const comments: any = await commentsCollection.find(filter)
-            .sort(sortBy, sortDirection)
-            .skip((pageNumber - 1) * pageSize)
-            .limit(pageSize)
-            .toArray()
-
-        const totalCount = await commentsCollection
-            .countDocuments(filter)
-
-        const pagesCount = Math.ceil(totalCount / pageSize)
-
-        return {
-            pagesCount: pagesCount,
-            page: +pageNumber,
-            pageSize: +pageSize,
-            totalCount: totalCount,
-            items: comments.map(commentsMapper)
-        }
+import {InsertOneResult, ObjectId} from "mongodb";
+import {commentsCollection} from "../db/db";
+import {CommentDbModel, commentMapper, CommentViewModel} from "../models/comments-model/comments-models";
 
 
-    }
+export const commentsRepository = {
 
-    static async getCommentById(id: any): Promise<OutputPostType | null> {
-        try {
-            console.log(id, 'id')
-            const comment: any = await commentsCollection.findOne({id:
-                    // new ObjectId(
-                id
-                // )
-            })
-            console.log(comment, 'comment')
-            if (!comment) {
-                return null
-            }
-            return commentsMapper(comment)
-        } catch (e) {
-            return null
-        }
-    }
+    async createComment(newComment: CommentDbModel): Promise<CommentViewModel> {
+        const result: InsertOneResult<CommentDbModel> = await commentsCollection.insertOne({...newComment})
+        return commentMapper({_id: result.insertedId, ...newComment})
+    },
 
-    static async createComments(content: string, id: string, postId: any) {
-
-        const createdAt = new Date()
-
-        const user: any = await usersCollection.findOne({_id: id})
-
-         const commentId = new ObjectId()
-
-        const newComment: any = {
-            postId:postId,
-            id: commentId.toString(),
-            content,
-            commentatorInfo: {
-                userId: id,
-                userLogin: user.login,
-            },
-            createdAt: createdAt.toISOString()
-        }
-        const comment = await commentsCollection.insertOne(newComment)
-
-        if (comment) {
-            const result: any = await commentsCollection.findOne({id: commentId.toString()})
-            return {
-                id: result!.id,
-                content: result!.content,
-                commentatorInfo: {
-                    userId: result.commentatorInfo.userId,
-                    userLogin: result.commentatorInfo.userLogin,
-                },
-                createdAt: result!.createdAt,
-            }
-        } else {
-            return null
-        }
-        //
-    }
-
-    static async updateComment(id: string, content: any,) {
-
-        let result = await commentsCollection.updateOne({id:
-                // new ObjectId(
-            id
-            // )
-        }, {
+    async updateComment(id: string, body: any): Promise<any> {
+        if(!ObjectId.isValid(id)) return false
+        const result = await commentsCollection.updateOne({_id: new ObjectId(id)}, {
             $set: {
-                content: content,
+                content: body.content
             }
         })
-
         return result.matchedCount === 1
-    }
+    },
 
-    static async deleteComment(id: string) {
+    async deleteComment(id: string): Promise<boolean> {
+        if(!ObjectId.isValid(id)) return false
+        const result = await commentsCollection.deleteOne({_id: new ObjectId(id)})
+        return result.deletedCount === 1
+    },
 
-        try {
+    async deleteAll() {
+        return  await commentsCollection.deleteMany({})
+    },
 
-            const result = await commentsCollection.deleteOne({id:
-                    // new ObjectId(
-                        id
-                    // )
-            })
-            return result.deletedCount === 1
-
-        } catch (e) {
-
-            return false
-
-        }
-    }
 }

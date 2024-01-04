@@ -1,167 +1,40 @@
-import {ObjectId, WithId} from "mongodb";
-import {usersCollection} from "../index";
-import bcrypt from 'bcrypt'
-import {BlogType} from "../types/blog/output";
-import {usersMapper} from "../types/users/mapper";
+import {UserDbModel, userMapper, UserViewModel} from "../models/users-models/users-models";
+import {usersCollection} from "../db/db";
+import {InsertOneResult, ObjectId, WithId} from "mongodb";
 
-export class UsersRepository {
-    static async getAllUsers(sortData: any) {
 
-        const sortDirection = sortData.sortDirection ?? 'desc'
-        const sortBy = sortData.sortBy ?? 'createdAt'
-        const searchNameTerm = sortData.searchNameTerm ?? null
-        const pageSize = sortData.pageSize ?? 10
-        const pageNumber = sortData.pageNumber ?? 1
-        // console.log(sortData.searchEmailTerm,'sortData.searchEmailTerm ')
-        // console.log(sortData.searchLoginTerm,'sortData.searchLoginTerm ')
-        const searchLoginTerm = sortData.searchLoginTerm ?? null
-        const searchEmailTerm = sortData.searchEmailTerm ?? null
+export const usersRepository = {
 
-        let filterLogin = {}
-        let filterEmail = {}
-
-        if (searchLoginTerm) {
-            filterLogin = {
-                login: {
-                    $regex: searchLoginTerm,
-                    $options: 'i'
-                }
-            }
-        }
-        if (searchEmailTerm) {
-            filterEmail = {
-                email: {
-                    $regex: searchEmailTerm,
-                    $options: 'i'
-                }
-            }
-        }
-        const filter = {
-            $or: [
-                filterLogin,
-                filterEmail,
-            ]
-        }
-
-        const users: WithId<BlogType>[] = await usersCollection.find(filter)
-            .sort(sortBy, sortDirection)
-            .skip((+pageNumber - 1) * +pageSize)
-            .limit(+pageSize)
+    async getAllUsers() {
+        return usersCollection
+            .find()
+            .sort('createdAt', -1)
             .toArray()
+    },
 
-        const totalCount = await usersCollection
-            .countDocuments(filter)
+    async createUser(user: UserDbModel): Promise<UserViewModel> {
+        const result: InsertOneResult<UserDbModel> = await usersCollection.insertOne({...user})
+        return userMapper({_id: result.insertedId, ...user})
+    },
 
-        const pageCount = Math.ceil(totalCount / +pageSize)
+    async findUserById(id: ObjectId) {
+        let product = await usersCollection.findOne({_id: id})
+        return product ? product : null
+    },
 
-        return {
-            pagesCount: pageCount,
-            page: +pageNumber,
-            pageSize: +pageSize,
-            totalCount: +totalCount,
-            items: users.map(usersMapper)
-        }
+    async findByLoginOrEmail(loginOrEmail: string): Promise<WithId<UserDbModel> | null> {
+        const user = await usersCollection.findOne({ $or: [ { email: loginOrEmail }, { login: loginOrEmail } ] } )
+        return user
+    },
 
-    }
-    static async createUser(login: any, email: any, password: any) {
+    async deleteUser(id: string): Promise<boolean> {
+        if(!ObjectId.isValid(id)) return false
+        const result = await usersCollection.deleteOne({_id: new ObjectId(id)})
+        return result.deletedCount === 1
+    },
 
-        const passwordSalt = await bcrypt.genSalt(10)
-        const passwordHash = await this._generateHash(password, passwordSalt)
-        console.log(passwordSalt,'passwordSalt')
-        console.log(passwordHash,'passwordHash')
-        const newUser = {
-            _id: new ObjectId(),
-            login:login,
-            email,
-            passwordHash,
-            passwordSalt,
-            createdAt: new Date()
-        }
-
-        const result = await usersCollection.insertOne(newUser)
-        const user = await usersCollection.findOne({_id: result.insertedId})
-
-        return usersMapper(user)
-    }
-    static async deleteUser(id: any) {
-
-        try {
-            const result = await usersCollection.deleteOne({_id: new ObjectId(id)})
-            return result.deletedCount === 1
-        } catch (e) {
-            return false
-        }
-    }
-
-    static async checkCredentials(authData: any) {
-        console.log(authData,'authData')
-        // const sortDirection = authData.sortDirection ?? 'desc'
-        // const sortBy = authData.sortBy ?? 'createdAt'
-        // const searchNameTerm = authData.searchNameTerm ?? null
-        // const pageSize = authData.pageSize ?? 10
-        // const pageNumber = authData.pageNumber ?? 1
-        const searchLoginTerm = authData.loginOrEmail ?? null
-        const searchEmailTerm = authData.loginOrEmail ?? null
-
-        let filterLogin = {}
-        let filterEmail = {}
-
-        if (searchLoginTerm) {
-            filterLogin = {
-                login: {
-                    $regex: searchLoginTerm,
-                    $options: 'i'
-                }
-            }
-        }
-        if (searchEmailTerm) {
-            filterEmail = {
-                email: {
-                    $regex: searchEmailTerm,
-                    $options: 'i'
-                }
-            }
-        }
-        const filter = {
-            $or: [
-                filterLogin,
-                filterEmail,
-            ]
-        }
-
-        const users: any = await usersCollection.findOne(filter)
-            // .find(filter)
-            // .sort(sortBy, sortDirection)
-            // .skip((+pageNumber - 1) * +pageSize)
-            // .limit(+pageSize)
-            // .toArray()
-
-        console.log(users,'users')
-
-        if (!users) {
-            return false
-        }
-
-        // const totalCount = await usersCollection
-        //     .countDocuments(filter)
-
-        console.log(users.passwordSalt,
-            'users.passwordSalt')
-        // const pageCount = Math.ceil(totalCount / +pageSize)
-        const passwordHash = await this._generateHash(authData.password, users.passwordSalt)
-        if (users.passwordHash !== passwordHash){
-            return false
-        }
-            return users
-
-    }
-
-
-     static async _generateHash(password: any, salt: any) {
-         const hash = await bcrypt.hash(password, salt)
-         console.log(hash,'hash')
-
-         return hash
-    }
+    async deleteAll() {
+        return  usersCollection.deleteMany({})
+    },
 
 }

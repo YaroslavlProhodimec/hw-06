@@ -32,6 +32,10 @@ commentsRoute.put('/:id',
         const id = req.params.id
         const comment: any = await CommentsRepository.getCommentById(id)
         console.log(comment,'comment')
+        if (!user){
+            res.sendStatus(401)
+            return;
+        }
         if (!comment) {
             res.sendStatus(404)
             return;
@@ -61,7 +65,12 @@ commentsRoute.delete('/:id',
                     id
                 // )
         })
-
+        if (!user){
+            res.sendStatus(401)
+            return;
+        }
+        console.log(comment,'comment')
+        console.log(user,'user')
         if (!comment) {
             res.sendStatus(404)
             return;

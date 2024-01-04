@@ -51,9 +51,9 @@ export const bearerAuth = async (req: any, res: Response, next: NextFunction) =>
 
     console.log(userId, 'userId await jwtService.getUserIdByToken(token)')
 
-    let id =  new ObjectId(userId)
+    // let id =  new ObjectId(userId)
     if (userId) {
-        req.user = await usersCollection.findOne({_id: id })
+        req.user = await usersCollection.findOne({_id: userId })
         console.log(req.user,'req.user ')
         return next()
     }
@@ -62,3 +62,16 @@ export const bearerAuth = async (req: any, res: Response, next: NextFunction) =>
 
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 }
+
+// {
+//     "id": "65970fb1ffe67777eeae0def",
+//     "login": "lg-769787",
+//     "email": "email769787@gg.com",
+//     "createdAt": "2024-01-04T20:06:09.953Z"
+// },
+// {
+//     "id": "65970fa8ffe67777eeae0dc8",
+//     "login": "lg-760304",
+//     "email": "email760304@gg.com",
+//     "createdAt": "2024-01-04T20:06:00.633Z"
+// }

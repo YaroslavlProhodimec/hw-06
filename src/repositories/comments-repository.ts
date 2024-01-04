@@ -40,14 +40,14 @@ export class CommentsRepository {
 
         const totalCount = await commentsCollection
             .countDocuments(filter)
-        const total = totalCount -1
-        const pageCount = Math.ceil(total / +pageSize)
+
+        const pageCount = Math.ceil(totalCount / +pageSize)
 
         return {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: total,
+            totalCount: +totalCount - 1,
             items: comments.map(commentsMapper)
         }
 

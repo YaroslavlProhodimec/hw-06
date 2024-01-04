@@ -73,19 +73,19 @@ postRoute.post('/:postId/comments', bearerAuth,
     commentsValidation(),
     async (req: any, res: Response) => {
         const content = req.body.content
-        const newComment = await CommentsRepository.createComments(content,req.user!._id)
+        const newComment = await CommentsRepository.createComments(content, req.user!._id)
 
         if (newComment) {
             res.status(HTTP_STATUSES.CREATED_201).json(newComment)
             return;
         }
 
-    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-})
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    })
 
 postRoute.get('/:postId/comments',
     // commentsValidation(),
-    commentsIdValidation(),
+    // commentsIdValidation(),
     async (req: any, res: Response) => {
         const sortData = {
             searchNameTerm: req.query.searchNameTerm,
@@ -94,15 +94,19 @@ postRoute.get('/:postId/comments',
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
         }
-
+        const postId = await PostRepository.getPostById(req.params.id)
+        if(!postId){
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+            return;
+        }
         const comments = await CommentsRepository.getAllCommentsQueryParam(sortData)
 
         if (comments) {
             res.status(HTTP_STATUSES.OK_200).json(comments)
             return;
         }
-    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-})
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    })
 
 
 

@@ -12,30 +12,30 @@ export const titleValidation = body('content')
     min: 20,
     max: 300
 }).withMessage('Incorrect xaxa content')
-export const postIdValidation = param('postId')
-    .optional()
-    // .isLength({ max: 30})
-    .isString()
-    .trim()
-    .notEmpty()
-    .custom( async (value)=>{
-        console.log(value,'value')
-        const post = await PostRepository.getPostById(value)
-        console.log(post,'post')
-        if (!post){
-
-            throw new Error('Post is not exists')
-        }
-
-        return true
-    })
-    .withMessage('Incorrect URL postId');
+// export const postIdValidation = param('postId')
+//     .optional()
+//     // .isLength({ max: 30})
+//     .isString()
+//     .trim()
+//     .notEmpty()
+//     .custom( async (value)=>{
+//         console.log(value,'value')
+//         const post = await PostRepository.getPostById(value)
+//         console.log(post,'post')
+//         if (!post){
+//
+//             throw new Error('Post is not exists')
+//         }
+//
+//         return true
+//     })
+//     .withMessage('Incorrect URL postId');
 export const commentsValidation = () => [
     titleValidation,
     // postIdValidation,
     inputModelValidation
 ]
-export const commentsIdValidation = () => [
-    postIdValidation,
-    inputModelValidation
-]
+// export const commentsIdValidation = () => [
+//     postIdValidation,
+//     inputModelValidation
+// ]

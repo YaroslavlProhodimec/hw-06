@@ -94,7 +94,7 @@ postRoute.get('/:postId/comments',
             pageNumber: req.query.pageNumber,
             pageSize: req.query.pageSize,
         }
-        const postId = await PostRepository.getPostById(req.params.id)
+        const postId = await PostRepository.getPostById(req.params.postId)
         if(!postId){
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;

@@ -16,7 +16,7 @@ export class CommentsRepository {
         const pageNumber = sortData.pageNumber ?? 1
 
         let filter = {
-            id: postId
+            postId: postId
         }
 
         // if (searchNameTerm) {
@@ -29,14 +29,14 @@ export class CommentsRepository {
         // }
         // const filter = {id: id}
 
-        const comments: any = await commentsCollection.find({id: postId})
+        const comments: any = await commentsCollection.find(filter)
             .sort(sortBy, sortDirection)
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .toArray()
 
         const totalCount = await commentsCollection
-            .countDocuments({id:postId})
+            .countDocuments(filter)
 
         const pagesCount = Math.ceil(totalCount / pageSize)
 

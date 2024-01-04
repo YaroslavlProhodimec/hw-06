@@ -9,7 +9,12 @@ import {BlogRepository} from "./blog-repository";
 
 export class CommentsRepository {
     static async getAllCommentsQueryParam(sortData: any) {
-
+        // searchNameTerm: req.query.searchNameTerm,
+        //     sortBy: req.query.sortBy,
+        //     sortDirection: req.query.sortDirection,
+        //     pageNumber: req.query.pageNumber,
+        //     pageSize: req.query.pageSize,
+        // pageSize=3&pageNumber=1
         const sortDirection = sortData.sortDirection ?? 'desc'
         const sortBy = sortData.sortBy ?? 'createdAt'
         const searchNameTerm = sortData.searchNameTerm ?? null
@@ -35,14 +40,14 @@ export class CommentsRepository {
 
         const totalCount = await commentsCollection
             .countDocuments(filter)
-
-        const pageCount = Math.ceil(totalCount / +pageSize)
+        const total = totalCount -1
+        const pageCount = Math.ceil(total / +pageSize)
 
         return {
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
-            totalCount: +totalCount - 1,
+            totalCount: total,
             items: comments.map(commentsMapper)
         }
 

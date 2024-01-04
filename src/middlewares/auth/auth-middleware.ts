@@ -57,7 +57,7 @@ export const bearerAuth = async (req: any, res: Response, next: NextFunction) =>
         return next()
     }
 
-    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    // res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
 
-    // res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 }

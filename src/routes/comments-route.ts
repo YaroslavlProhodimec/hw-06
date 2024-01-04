@@ -31,7 +31,7 @@ commentsRoute.put('/:id',
         const user = req.user
         const id = req.params.id
         const comment: any = await CommentsRepository.getCommentById(id)
-
+        console.log(comment,'comment')
         if (!comment) {
             res.sendStatus(404)
             return;
@@ -43,7 +43,7 @@ commentsRoute.put('/:id',
         }
 
         const isUpdated = await CommentsRepository.updateComment(id, content,)
-
+        console.log(isUpdated,'isUpdated')
         if (isUpdated) {
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
             return;
@@ -56,7 +56,11 @@ commentsRoute.delete('/:id',
     async (req: any, res: Response) => {
         const user = req.user
         const id = req.params.id
-        const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
+        const comment: any = await commentsCollection.findOne({id:
+                // new ObjectId(
+                    id
+                // )
+        })
 
         if (!comment) {
             res.sendStatus(404)

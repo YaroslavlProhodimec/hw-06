@@ -54,7 +54,11 @@ export class CommentsRepository {
     static async getCommentById(id: any): Promise<OutputPostType | null> {
         try {
             console.log(id, 'id')
-            const comment: any = await commentsCollection.findOne({id: new ObjectId(id)})
+            const comment: any = await commentsCollection.findOne({id:
+                    // new ObjectId(
+                id
+                // )
+            })
             console.log(comment, 'comment')
             if (!comment) {
                 return null
@@ -63,7 +67,6 @@ export class CommentsRepository {
         } catch (e) {
             return null
         }
-
     }
 
     static async createComments(content: string, id: string, postId: any) {
@@ -104,7 +107,11 @@ export class CommentsRepository {
 
     static async updateComment(id: string, content: any,) {
 
-        let result = await commentsCollection.updateOne({id: new ObjectId(id)}, {
+        let result = await commentsCollection.updateOne({id:
+                // new ObjectId(
+            id
+            // )
+        }, {
             $set: {
                 content: content,
             }
@@ -117,7 +124,11 @@ export class CommentsRepository {
 
         try {
 
-            const result = await commentsCollection.deleteOne({id: new ObjectId(id)})
+            const result = await commentsCollection.deleteOne({id:
+                    // new ObjectId(
+                        id
+                    // )
+            })
             return result.deletedCount === 1
 
         } catch (e) {
